@@ -23,4 +23,4 @@ jobs:
           curl -X POST -Ss https://api.github.com/repos/xiaomirom/xiaomirom.github.io/actions/workflows/updater.yml/dispatches \
           -H 'Accept: application/vnd.github.v3+json' \
           -H 'Authorization: token ${{ secrets.PAT }}' \
-          --data '{"ref": "Jobs"}'
+          --data '{"ref": "updater"}'
