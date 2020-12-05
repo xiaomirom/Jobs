@@ -17,6 +17,12 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
+          #fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
+          fetch-depth: 1
+
       - name: Call Updater
         # Being pushed and pull request merged may contain site related changes, just rebuild the site always
         run: |
@@ -24,3 +30,18 @@ jobs:
           -H 'Accept: application/vnd.github.v3+json' \
           -H 'Authorization: token ${{ secrets.PAT }}' \
           --data '{"ref": "updater"}'
+      - name: Log
+        run: |
+          echo $(date +%d.%m.%Y) > run.log
+      - name: Commit files
+        id: commit
+        run: |
+          git config --local user.email "xiaomirom-jobs-action@users.noreply.github.com"
+          git config --local user.name "xiaomirom-jobs Github Action Bot"
+          git add .
+          &>/dev/null git commit -m "Last active: $(date +%d.%m.%Y)" && echo "::set-output name=committed::1" || echo "Nothing to update"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
